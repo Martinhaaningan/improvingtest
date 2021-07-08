@@ -2,22 +2,23 @@
 <html>
 <head>
 	<title>Improving opgave</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	
-<div>
+<header>
 	<h1>Solopgang og solnedgang</h1>
-</div>
-
-<form method="get" action="index.php">
-	<select name="location">
-		<option value="copenhagen" name="city">København</option>
-		<option value="kolding" name="city">Kolding</option>
-	</select>
-	<input name="dato" type="date">
-	<input type="submit" name="submit" value="Submit">
-</form>
-
+	<form method="get" action="index.php">
+		<select name="location">
+			<option value="Copenhagen">Copenhagen</option>
+			<option value="Kolding">Kolding</option>
+			<option value="Aarhus">Aarhus</option>
+			<option value="Herning">Herning</option>
+		</select>
+		<input name="dato" type="date">
+		<input type="submit" name="submit" value="Submit">
+	</form>
+</header>
 
 </body>
 </html>
@@ -29,13 +30,12 @@ $date = $_GET['dato'];
 
 $wd = date("N", strtotime($date)); //Hvilken ugedag er den valgte dato
 
-if(isset($_GET['location'])){
-echo $_GET['location'];
-}
-
+echo '<div id="wrap">';
 if(!empty($date)){
+	
 	if(isset($_GET['submit'])){
 		$selected = $_GET['location'];
+		echo '<h1>', $selected, '</h1>';
 
 		//API kald for længde- og breddegrad til den valgte by
 		$api_url = 'http://geodb-free-service.wirefreethought.com/v1/geo/cities?limit=1&offset=0&namePrefix=' . $selected;
@@ -63,10 +63,14 @@ if(!empty($date)){
 	 	$sunrise->setTimezone($localtz);
 	 	$sunset->setTimezone($localtz);
 
-	 	echo '<p>Dato: ', $date , '</p><br>' ;
-	 	echo '<p>Solopgang: </p>', $sunrise->format('H:i:s') . "\n";
-	 	echo '<p>Solnedgang: </p>', $sunset->format('H:i:s') . "\n";
+	 	echo '<div class="container">';
+	 	echo '<p>Dato: ', $date , '</p>' ;
+	 	echo '<p>Solopgang: ', $sunrise->format('H:i:s') . "\n", '</p>';
+	 	echo '<p>Solnedgang: ', $sunset->format('H:i:s') . "\n", '</p>';
+	 	echo '</div>';
 	 	$date = date("Y-m-d", strtotime($date. '+ 1 days'));
- 	}	
- }
+ 	}
+ 	
+}
+echo '</div>';	
 ?>

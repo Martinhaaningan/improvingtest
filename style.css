@@ -1,0 +1,43 @@
+body {
+
+	background-color: blue;
+}
+
+header {
+	width: 50%;
+	margin: auto; 
+	margin-bottom: 40px;
+	border: 2px solid black;
+	padding-bottom: 40px;
+}
+
+
+h1 {
+	color: gold;
+}
+p {
+	margin-top: 40px;
+	color: white;
+	text-align: center;
+	display: block;
+	width: 100%;
+}
+
+form {
+
+}
+
+#wrap{
+	height: 200px;
+	width: 50%;
+	margin: auto; 
+}
+
+.container {
+	margin-top: 20px;
+	border-left: 2px solid black;
+	width: 200px;
+	height: 200px;
+	display: block;
+	float: left;
+}
