@@ -10,7 +10,7 @@
 	<h1>Solopgang og solnedgang</h1>
 	<form method="get" action="index.php">
 		<select name="location">
-			<option value="Copenhagen">Copenhagen</option>
+			<option selected="selected" value="Copenhagen">Copenhagen</option>
 			<option value="Kolding">Kolding</option>
 			<option value="Aarhus">Aarhus</option>
 			<option value="Herning">Herning</option>
@@ -26,51 +26,58 @@
 
 $tz = new DateTimeZone('Europe/London');
 $localtz = new DateTimeZone('Europe/Copenhagen');
-$date = $_GET['dato'];
+
+//sætter default når der ikke er valgt en dato
+if (empty($_GET['dato'])) {
+	$date = date("Y-m-d");
+} 
+elseif (!empty($_GET['dato'])) {
+	$date = $_GET['dato'];
+}
+
+//sætter default når der ikke er valgt en by
+if (empty($_GET['location'])) {
+	$selected = "Copenhagen";
+} 
+elseif (!empty($_GET['location'])) {
+	$selected = $_GET['location'];
+}
+
+//API kald for længde- og breddegrad til den valgte by
+$api_url = 'http://geodb-free-service.wirefreethought.com/v1/geo/cities?limit=1&offset=0&namePrefix=' . $selected;
+		
+//json data til variable og parses til PHP array
+$api_json = file_get_contents($api_url);
+$api_array = json_decode($api_json, true);
+
+//Data fra API lægges i variabler
+$lat = $api_array['data'][0]['latitude'];
+$lng = $api_array['data'][0]['longitude'];
 
 $wd = date("N", strtotime($date)); //Hvilken ugedag er den valgte dato
 
 echo '<div id="wrap">';
-if(!empty($date)){
-	
-	if(isset($_GET['submit'])){
-		$selected = $_GET['location'];
-		echo '<h1>', $selected, '</h1>';
+echo '<h1>', $selected, '</h1>';
+for ($wd; $wd <= 7; $wd++) {
+ 	//API kald for solopgang og solnedgang		
+	 $api_url = 'https://api.sunrise-sunset.org/json?lat='. $lat . '&lng='. $lng . '&date=' . $date .'&formatted=0';
 
-		//API kald for længde- og breddegrad til den valgte by
-		$api_url = 'http://geodb-free-service.wirefreethought.com/v1/geo/cities?limit=1&offset=0&namePrefix=' . $selected;
-		
-		//json data til variable og parses til PHP array
-		$api_json = file_get_contents($api_url);
-		$api_array = json_decode($api_json, true);
+	 //json til variable og parses til PHP array
+	 $api_json = file_get_contents($api_url);
+	 $api_array = json_decode($api_json, true);
 
-		//Data fra API lægges i variabler
-		$lat = $api_array['data'][0]['latitude'];
- 		$lng = $api_array['data'][0]['longitude'];
-	}
- 	
- 	for ($wd; $wd <= 7; $wd++) {
- 		//API kald for solopgang og solnedgang		
-	 	$api_url = 'https://api.sunrise-sunset.org/json?lat='. $lat . '&lng='. $lng. '&date=' . $date .'&formatted=0';
+	 //Konvertering fra UTZ til CEST
+	 $sunrise = new DateTime($api_array['results']['sunrise'], $tz);
+	 $sunset = new DateTime($api_array['results']['sunset'], $tz);
+	 $sunrise->setTimezone($localtz);
+	 $sunset->setTimezone($localtz);
 
-	 	//json til variable og parses til PHP array
-	 	$api_json = file_get_contents($api_url);
-	 	$api_array = json_decode($api_json, true);
-
-	 	//Konvertering fra UTZ til CEST
-	 	$sunrise = new DateTime($api_array['results']['sunrise'], $tz);
-	 	$sunset = new DateTime($api_array['results']['sunset'], $tz);
-	 	$sunrise->setTimezone($localtz);
-	 	$sunset->setTimezone($localtz);
-
-	 	echo '<div class="container">';
-	 	echo '<p>Dato: ', $date , '</p>' ;
-	 	echo '<p>Solopgang: ', $sunrise->format('H:i:s') . "\n", '</p>';
-	 	echo '<p>Solnedgang: ', $sunset->format('H:i:s') . "\n", '</p>';
-	 	echo '</div>';
-	 	$date = date("Y-m-d", strtotime($date. '+ 1 days'));
- 	}
- 	
-}
+	 echo '<div class="container">';
+	 echo '<p>Dato: ', $date , '</p>' ;
+	 echo '<p>Solopgang: ', $sunrise->format('H:i:s') . "\n", '</p>';
+	 echo '<p>Solnedgang: ', $sunset->format('H:i:s') . "\n", '</p>';
+	 echo '</div>';
+	 $date = date("Y-m-d", strtotime($date. '+ 1 days'));
+ }	
 echo '</div>';	
 ?>
