@@ -14,6 +14,7 @@
 			<option value="Kolding">Kolding</option>
 			<option value="Aarhus">Aarhus</option>
 			<option value="Herning">Herning</option>
+			<option value="Odense">Odense</option>
 		</select>
 		<input name="dato" type="date">
 		<input type="submit" name="submit" value="Submit">
@@ -63,10 +64,11 @@ function getLocation() {
 	return $loc;
 }
 
-echo '<div id="wrap">';
+
 
 function postDays($date, $city, $lat, $lng) {
 	$wd = date("N", strtotime($date)); //Hvilken ugedag er den valgte dato
+	echo '<div id="wrap">';
 	echo '<h1>', $city, '</h1>';
 
 	//for hver uge dag indtil næste søndag udføres koden
@@ -88,16 +90,17 @@ function postDays($date, $city, $lat, $lng) {
 
 		echo '<div class="container">';
 		echo '<p>Dato: ', $date , '</p>' ;
-		echo '<p>Solopgang: ', $sunrise->format('H:i:s') . "\n", '</p>';
-		echo '<p>Solnedgang: ', $sunset->format('H:i:s') . "\n", '</p>';
+		echo '<p>Solopgang: ', $sunrise->format('H:i') . "\n", '</p>';
+		echo '<p>Solnedgang: ', $sunset->format('H:i') . "\n", '</p>';
 		echo '</div>';
 		$date = date("Y-m-d", strtotime($date. '+ 1 days'));
  	}
+ 	echo '</div>';	
 }
 
 postDays(getDates(), getCity(), getLocation()[0], getLocation()[1]);
 
-echo '</div>';	
+
 ?>
 
 </body>
