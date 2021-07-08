@@ -19,9 +19,6 @@
 		<input type="submit" name="submit" value="Submit">
 	</form>
 </header>
-
-</body>
-</html>
 <?php
 
 
@@ -104,3 +101,6 @@ postDays(getDates(), getCity(), getLocation()[0], getLocation()[1]);
 
 echo '</div>';	
 ?>
+
+</body>
+</html>
