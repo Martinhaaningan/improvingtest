@@ -103,12 +103,12 @@ function postData($date, $city) {
 
 		//for hver ugedag indtil næste søndag udføres koden
 		for ($wd; $wd <= 7; $wd++) {
-			getData(getDates(), getCity(), getLocation()[0], getLocation()[1]);
+			getData($date, getCity(), getLocation()[0], getLocation()[1]);
 			$date = date("Y-m-d", strtotime($date. '+ 1 days'));
 	 	}
 
-	echo '</div>';
  	}
+ 	echo '</div>';
 }
 
 postData(getDates(),getCity());
