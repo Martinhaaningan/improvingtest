@@ -15,7 +15,11 @@ header {
 	padding-bottom: 40px;
 	padding-top: 40px;
 }
-
+a {
+	color: gold;
+	margin-left: 40px;
+	margin-top: 20px;
+}
 
 h1 {
 	color: gold;

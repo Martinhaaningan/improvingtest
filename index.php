@@ -64,42 +64,54 @@ function getLocation() {
 	return $loc;
 }
 
+function getData($date, $city, $lat, $lng) {
+	//API kald for solopgang og solnedgang		
+	$api_url = 'https://api.sunrise-sunset.org/json?lat='. $lat . '&lng='. $lng . '&date=' . $date .'&formatted=0';
+
+	//json til variable og parses til PHP array
+	$api_json = file_get_contents($api_url);
+	$api_array = json_decode($api_json, true);
+
+	//Konvertering fra UTZ til CEST
+	$tz = new DateTimeZone('Europe/London');
+	$localtz = new DateTimeZone('Europe/Copenhagen');
+	$sunrise = new DateTime($api_array['results']['sunrise'], $tz);
+	$sunset = new DateTime($api_array['results']['sunset'], $tz);
+	$sunrise->setTimezone($localtz);
+	$sunset->setTimezone($localtz);
+
+	echo '<div class="container">';
+	echo '<p>Dato: ', $date , '</p>' ;
+	echo '<p>Solopgang: ', $sunrise->format('H:i') . "\n", '</p>';
+	echo '<p>Solnedgang: ', $sunset->format('H:i') . "\n", '</p>';
+	echo '</div>';	
+}
 
 
-function postDays($date, $city, $lat, $lng) {
+function postData($date, $city) {
 	$wd = date("N", strtotime($date)); //Hvilken ugedag er den valgte dato
 	echo '<div id="wrap">';
 	echo '<h1>', $city, '</h1>';
 
-	//for hver uge dag indtil næste søndag udføres koden
-	for ($wd; $wd <= 7; $wd++) {
-	 	//API kald for solopgang og solnedgang		
-		$api_url = 'https://api.sunrise-sunset.org/json?lat='. $lat . '&lng='. $lng . '&date=' . $date .'&formatted=0';
+	//hvis der er sat en specifik dato udskrives tidspunkterne ud for denne dato
+	if (!empty($_GET['dato'])) {
+		getData(getDates(), getCity(), getLocation()[0], getLocation()[1]);
+	}
 
-		//json til variable og parses til PHP array
-		$api_json = file_get_contents($api_url);
-		$api_array = json_decode($api_json, true);
+	//hvis der ikke er sat en dato udskrives tidspunkterne for hver dag indtil næste søndag
+	if (empty($_GET['dato'])) {
 
-		//Konvertering fra UTZ til CEST
-		$tz = new DateTimeZone('Europe/London');
-		$localtz = new DateTimeZone('Europe/Copenhagen');
-		$sunrise = new DateTime($api_array['results']['sunrise'], $tz);
-		$sunset = new DateTime($api_array['results']['sunset'], $tz);
-		$sunrise->setTimezone($localtz);
-		$sunset->setTimezone($localtz);
+		//for hver ugedag indtil næste søndag udføres koden
+		for ($wd; $wd <= 7; $wd++) {
+			getData(getDates(), getCity(), getLocation()[0], getLocation()[1]);
+			$date = date("Y-m-d", strtotime($date. '+ 1 days'));
+	 	}
 
-		echo '<div class="container">';
-		echo '<p>Dato: ', $date , '</p>' ;
-		echo '<p>Solopgang: ', $sunrise->format('H:i') . "\n", '</p>';
-		echo '<p>Solnedgang: ', $sunset->format('H:i') . "\n", '</p>';
-		echo '</div>';
-		$date = date("Y-m-d", strtotime($date. '+ 1 days'));
+	echo '</div>';
  	}
- 	echo '</div>';	
 }
 
-postDays(getDates(), getCity(), getLocation()[0], getLocation()[1]);
-
+postData(getDates(),getCity());
 
 ?>
 
